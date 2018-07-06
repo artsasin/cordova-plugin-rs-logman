@@ -156,6 +156,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             Log.d("RS-LOGMAN", "Execute SET-MODULE-NUMBER to " + Integer.toString(mn));
             this.moduleNumber = mn;
         } else if (action.equals("result")) {
+            Log.d("RS-LOGMAN", "Execute RESULT");
             JSONArray sensorData;
             try {
                 sensorData = new JSONArray(this.results);
