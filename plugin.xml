@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="ru.cinet.rslogman" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>cordova-plugin-rs-logman</name>
+	<js-module name="CordovaPluginRsLogman" src="www/cordova-plugin-rs-logman.js">
+		<clobbers target="cordova.plugins.cordova-plugin-rs-logman" />
+	</js-module>
+	<platform name="android">
+		<config-file parent="/*" target="res/xml/config.xml">
+			<feature name="CordovaPluginRsLogman">
+				<param name="android-package" value="ru.cinet.rslogman.cordova-plugin-rs-logman" />
+			</feature>
+		</config-file>
+		<config-file parent="/*" target="AndroidManifest.xml"></config-file>
+		<source-file src="src/android/CordovaPluginRsLogman.java" target-dir="src/ru/cinet/rslogman/cordova-plugin-rs-logman" />
+	</platform>
+</plugin>

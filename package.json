@@ -1,0 +1,17 @@
+{
+  "name": "ru.cinet.rslogman",
+  "version": "0.1.0",
+  "description": "Research Survey Logman",
+  "cordova": {
+    "id": "ru.cinet.rslogman",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "",
+  "license": "MIT"
+}
