@@ -2,7 +2,7 @@ package ru.cinet.rslogman;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import android.util.Log;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -84,7 +84,6 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
         if (action.equals("start")) {
-            Log.d("RS-LOGMAN", "Execute START");
             this.callbackContext = callbackContext;
             if (this.status != CordovaPluginRsLogman.RUNNING) {
                 // If not running, then this is an async call, so don't worry about waiting
@@ -92,11 +91,10 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 this.start();
             }
         } else if (action.equals("stop")) {
-            Log.d("RS-LOGMAN", "Execute STOP");
             if (this.status == CordovaPluginRsLogman.RUNNING) {
                 this.stop();
             }
-        } else if (action.equals('set-median')) {
+        } else if (action.equals("set-median")) {
             double m;
             try {
                 m = args.getDouble(0);
@@ -104,16 +102,12 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 e.printStackTrace();
                 return false;
             }
-            Log.d("RS-LOGMAN", "Execute SET MEDIAN to " + Double.toString(m));
             this.median = m;
         } else if (action.equals("start-collect")) {
-            Log.d("RS-LOGMAN", "Execute START-COLLECT");
             this.collectData = true;
         } else if (action.equals("stop-collect")) {
-            Log.d("RS-LOGMAN", "Execute STOP-COLLECT");
             this.collectData = false;
         } else if (action.equals("increment-log-entry-index")) {
-            Log.d("RS-LOGMAN", "Execute INCREMENT-LOG-ENTRY-INDEX");
             this.logEntryIndex++;
         } else if (action.equals("set-log-entry-category-key")) {
             String ck;
@@ -123,7 +117,6 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 e.printStackTrace();
                 return false;
             }
-            Log.d("RS-LOGMAN", "Execute SET-LOG-ENTRY-CATEGORY-KEY to " + ck);
             this.logEntryCategoryKey = ck;
         } else if (action.equals("set-log-entry-stimul-key")) {
             String sk;
@@ -133,7 +126,6 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 e.printStackTrace();
                 return false;
             }
-            Log.d("RS-LOGMAN", "Execute SET-LOG-ENTRY-STIMUL-KEY to " + sk);
             this.logEntryStimulKey = sk;
         } else if (action.equals("set-module-stage")) {
             int ms;
@@ -143,7 +135,6 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 e.printStackTrace();
                 return false;
             }
-            Log.d("RS-LOGMAN", "Execute SET-MODULE-STAGE to " + Integer.toString(ms));
             this.moduleStage = ms;
         } else if (action.equals("set-module-number")) {
             int mn;
@@ -153,21 +144,13 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 e.printStackTrace();
                 return false;
             }
-            Log.d("RS-LOGMAN", "Execute SET-MODULE-NUMBER to " + Integer.toString(mn));
             this.moduleNumber = mn;
         } else if (action.equals("result")) {
-            Log.d("RS-LOGMAN", "Execute RESULT");
             JSONArray sensorData;
-            try {
-                sensorData = new JSONArray(this.results);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-
+            sensorData = new JSONArray(this.results);
             PluginResult r = new PluginResult(PluginResult.Status.OK, sensorData);
             r.setKeepCallback(true);
-            callbackContext.sendPluginResult(result);
+            callbackContext.sendPluginResult(r);
             return true;
         } else {
             // Unsupported action
@@ -297,7 +280,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
 
         if (this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
             // Save time that event was received
-            this.timestamp = event.timestamp;
+            this.timestamp = System.currentTimeMillis();
             this.x = event.values[0];
             this.y = event.values[1];
             this.z = event.values[2];
@@ -334,16 +317,16 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
     private void win() {
         if (this.collectData) {
             String[] result = new String[10];
-            result[0] = this.timestamp;
+            result[0] = Long.toString(this.timestamp);
             result[1] = "bmp";
             result[2] = Integer.toString(this.moduleNumber);
             result[3] = Integer.toString(this.moduleStage);
             result[4] = this.logEntryCategoryKey;
             result[5] = this.logEntryStimulKey;
             result[6] = Integer.toString(this.logEntryIndex);
-            result[7] = Float.toString(this.x);
-            result[8] = Float.toString(this.y + (float) this.median);
-            result[9] = Float.toString(this.z);
+            result[7] = String.format("%.10f", this.x);
+            result[8] = String.format("%.10f", (this.y + (float) this.median));
+            result[9] = String.format("%.10f", this.z);
             this.results.add(result);
         }
     }
