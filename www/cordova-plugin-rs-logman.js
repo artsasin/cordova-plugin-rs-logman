@@ -36,6 +36,10 @@ exports.setModuleStage = function (arg0, success, error) {
     exec(success, error, 'CordovaPluginRsLogman', 'set-module-stage', [arg0]);
 };
 
+exports.setStype = function(arg0, success, error) {
+    exec(success, error, 'CordovaPluginRsLogman', 'set-stype', [arg0]);
+}
+
 exports.setModuleNumber = function (arg0, success, error) {
     exec(success, error, 'CordovaPluginRsLogman', 'set-module-number', [arg0]);
 };

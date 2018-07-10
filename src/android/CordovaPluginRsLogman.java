@@ -43,6 +43,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
     private int logEntryIndex;
     private String logEntryCategoryKey;
     private String logEntryStimulKey;
+    private String stype;
 
     private ArrayList<String[]> results = new ArrayList<>();
 
@@ -73,6 +74,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         this.logEntryIndex = 0;
         this.logEntryCategoryKey = "N";
         this.logEntryStimulKey = "N";
+        this.stype = "bmp";
     }
 
     @Override
@@ -145,6 +147,15 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 return false;
             }
             this.moduleNumber = mn;
+        } else if (action.equals("set-stype")) {
+            String st;
+            try {
+                st = args.getString(0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+            this.stype = st;
         } else if (action.equals("result")) {
             JSONArray sensorData;
             sensorData = new JSONArray(this.results);
@@ -318,7 +329,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         if (this.collectData) {
             String[] result = new String[10];
             result[0] = Long.toString(this.timestamp);
-            result[1] = "bmp";
+            result[1] = this.stype;
             result[2] = Integer.toString(this.moduleNumber);
             result[3] = Integer.toString(this.moduleStage);
             result[4] = this.logEntryCategoryKey;
