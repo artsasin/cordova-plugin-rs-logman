@@ -327,7 +327,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
 
     private void win() {
         if (this.collectData) {
-            String[] result = new String[10];
+            String[] result = new String[11];
             result[0] = Long.toString(this.timestamp);
             result[1] = this.stype;
             result[2] = Integer.toString(this.moduleNumber);
@@ -335,9 +335,10 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             result[4] = this.logEntryCategoryKey;
             result[5] = this.logEntryStimulKey;
             result[6] = Integer.toString(this.logEntryIndex);
-            result[7] = String.format("%.10f", this.x);
-            result[8] = String.format("%.10f", (this.y + (float) this.median));
-            result[9] = String.format("%.10f", this.z);
+            result[7] = "1";
+            result[8] = String.format("%.10f", this.x);
+            result[9] = String.format("%.10f", (this.y + (float) this.median));
+            result[10] = String.format("%.10f", this.z);
             this.results.add(result);
         }
     }
