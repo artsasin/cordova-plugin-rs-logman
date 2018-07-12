@@ -47,3 +47,7 @@ exports.setModuleNumber = function (arg0, success, error) {
 exports.result = function (arg0, success, error) {
     exec(success, error, 'CordovaPluginRsLogman', 'result', [arg0]);
 };
+
+exports.setLogentryProps = function(arg0, success, error) {
+    exec(success, error, 'CordovaPluginRsLogman', 'set-logentry-props', [arg0]);
+};

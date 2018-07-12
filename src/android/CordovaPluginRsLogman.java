@@ -156,6 +156,60 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 return false;
             }
             this.stype = st;
+        } else if (action.equals("set-logentry-props")) {
+            /**
+             * stype - тип предьявляемых стимулов (bmp, spi и тд.)
+             * sindex - номер модуля
+             * state - этап внутри модуля
+             * cat - категория
+             * stm - идентификатор (название) стимула
+             * stmkey - индекс стимула (общий счетчик в рамках исследования)
+             */
+            JSONObject logentryProps;
+            try {
+                logentryProps = args.getJSONObject(0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            String stype;
+            int sindex;
+            int state;
+            String cat;
+            String stm;
+            boolean stmkey;
+
+            try {
+                stype = logentryProps.isNull("stype") ? "" : logentryProps.getString("stype");
+                sindex = logentryProps.isNull("sindex") ? -100 : logentryProps.getInt("sindex");
+                state = logentryProps.isNull("state") ? -100 : logentryProps.getInt("state");
+                cat = logentryProps.isNull("cat") ? "" : logentryProps.getString("cat");
+                stm = logentryProps.isNull("stm") ? "" : logentryProps.getString("stm");
+                stmkey = logentryProps.isNull("stmkey") ? false : logentryProps.getBoolean("stmkey");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            if (stype != "") {
+                this.stype = stype;
+            }
+            if (sindex != -100) {
+                this.moduleNumber = sindex;
+            }
+            if (state != -100) {
+                this.moduleStage = state;
+            }
+            if (cat != "") {
+                this.logEntryCategoryKey = cat;
+            }
+            if (stm != "") {
+                this.logEntryStimulKey = stm;
+            }
+            if (stmkey) {
+                this.logEntryIndex++;
+            }
         } else if (action.equals("result")) {
             JSONArray sensorData;
             sensorData = new JSONArray(this.results);
@@ -336,9 +390,9 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             result[5] = this.logEntryStimulKey;
             result[6] = Integer.toString(this.logEntryIndex);
             result[7] = "1";
-            result[8] = String.format("%.10f", this.x);
-            result[9] = String.format("%.10f", (this.y + (float) this.median));
-            result[10] = String.format("%.10f", this.z);
+            result[8] = String.format("%.10f", this.x).replace(',', '.');
+            result[9] = String.format("%.10f", (this.y + (float) this.median)).replace(',', '.');
+            result[10] = String.format("%.10f", this.z).replace(',', '.');
             this.results.add(result);
         }
     }
