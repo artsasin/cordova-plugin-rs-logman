@@ -247,7 +247,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         // If found, then register as listener
         if ((list != null) && (list.size() > 0)) {
             this.mSensor = list.get(0);
-            if (this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_GAME)) {
+            if (this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_FASTEST)) {
                 this.setStatus(CordovaPluginRsLogman.STARTING);
                 // CB-11531: Mark accuracy as 'reliable' - this is complementary to
                 // setting it to 'unreliable' 'stop' method
@@ -302,7 +302,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         if (this.status == CordovaPluginRsLogman.STARTING && this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
             // call win with latest cached position
             // but first check if cached position is reliable
-            this.timestamp = System.currentTimeMillis();
+            this.timestamp = System.currentTimeMillis() * 1000000;
             this.win();
         }
     }
@@ -345,7 +345,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
 
         if (this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
             // Save time that event was received
-            this.timestamp = System.currentTimeMillis();
+            this.timestamp = event.timestamp;
             this.x = event.values[0];
             this.y = event.values[1];
             this.z = event.values[2];
