@@ -222,7 +222,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             return false;
         }
 
-        PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT, "");
+        PluginResult result = new PluginResult(PluginResult.Status.OK, "");
         result.setKeepCallback(true);
         callbackContext.sendPluginResult(result);
         return true;
