@@ -9,39 +9,15 @@ exports.stop = function (arg0, success, error) {
 };
 
 exports.setMedian = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-median', [arg0]);
+    exec(success, error, 'CordovaPluginRsLogman', 'setMedian', [arg0]);
 };
 
 exports.startCollect = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'start-collect', [arg0]);
+    exec(success, error, 'CordovaPluginRsLogman', 'startCollect', [arg0]);
 };
 
 exports.stopCollect = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'stop-collect', [arg0]);
-};
-
-exports.incrementLogEntryIndex = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'increment-log-entry-index', [arg0]);
-};
-
-exports.setLogEntryCategoryKey = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-log-entry-category-key', [arg0]);
-};
-
-exports.setLogEntryStimulKey = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-log-entry-stimul-key', [arg0]);
-};
-
-exports.setModuleStage = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-module-stage', [arg0]);
-};
-
-exports.setStype = function(arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-stype', [arg0]);
-}
-
-exports.setModuleNumber = function (arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-module-number', [arg0]);
+    exec(success, error, 'CordovaPluginRsLogman', 'stopCollect', [arg0]);
 };
 
 exports.result = function (arg0, success, error) {
@@ -49,5 +25,5 @@ exports.result = function (arg0, success, error) {
 };
 
 exports.setLogentryProps = function(arg0, success, error) {
-    exec(success, error, 'CordovaPluginRsLogman', 'set-logentry-props', [arg0]);
+    exec(success, error, 'CordovaPluginRsLogman', 'setLogentryProps', [arg0]);
 };

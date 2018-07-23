@@ -96,7 +96,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             if (this.status == CordovaPluginRsLogman.RUNNING) {
                 this.stop();
             }
-        } else if (action.equals("set-median")) {
+        } else if (action.equals("setMedian")) {
             Double m;
             try {
                 m = args.getDouble(0);
@@ -105,58 +105,11 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 return false;
             }
             this.median = m;
-        } else if (action.equals("start-collect")) {
+        } else if (action.equals("startCollect")) {
             this.collectData = true;
-        } else if (action.equals("stop-collect")) {
+        } else if (action.equals("stopCollect")) {
             this.collectData = false;
-        } else if (action.equals("increment-log-entry-index")) {
-            this.logEntryIndex++;
-        } else if (action.equals("set-log-entry-category-key")) {
-            String ck;
-            try {
-                ck = args.getString(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-            this.logEntryCategoryKey = ck;
-        } else if (action.equals("set-log-entry-stimul-key")) {
-            String sk;
-            try {
-                sk = args.getString(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-            this.logEntryStimulKey = sk;
-        } else if (action.equals("set-module-stage")) {
-            Integer ms;
-            try {
-                ms = args.getInt(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-            this.moduleStage = ms;
-        } else if (action.equals("set-module-number")) {
-            Integer mn;
-            try {
-                mn = args.getInt(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-            this.moduleNumber = mn;
-        } else if (action.equals("set-stype")) {
-            String st;
-            try {
-                st = args.getString(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
-            }
-            this.stype = st;
-        } else if (action.equals("set-logentry-props")) {
+        } else if (action.equals("setLogentryProps")) {
             /**
              * stype - тип предьявляемых стимулов (bmp, spi и тд.)
              * sindex - номер модуля
@@ -222,6 +175,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             PluginResult r = new PluginResult(PluginResult.Status.OK, sensorData);
             r.setKeepCallback(true);
             callbackContext.sendPluginResult(r);
+            this.results = new ArrayList<>();
             return true;
         } else {
             // Unsupported action
