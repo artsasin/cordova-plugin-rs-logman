@@ -2,6 +2,10 @@ package ru.cinet.rslogman;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.os.HandlerThread;
+import android.os.SystemClock;
+import android.os.Process;
 import android.util.Log;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaInterface;
@@ -32,6 +36,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
     public static int RUNNING = 2;
     public static int ERROR_FAILED_TO_START = 3;
 
+    private long timerDelay = 20;
     private float x, y, z;
     private long timestamp;
     private int status;
@@ -53,13 +58,8 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
 
     private CallbackContext callbackContext;
 
-    private Handler mainHandler = null;
-
-    private Runnable mainRunnable = new Runnable() {
-        public void run() {
-            CordovaPluginRsLogman.this.timeout();
-        }
-    };
+    private HandlerThread mSensorThread;
+    private Handler mSensorHandler = null;
 
     public CordovaPluginRsLogman() {
         this.x = 0;
@@ -80,6 +80,8 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        this.mSensorThread = new HandlerThread("Sensor thread", Thread.MAX_PRIORITY);
+        mSensorThread.start();
         this.sensorManager = (SensorManager) cordova.getActivity().getSystemService(Context.SENSOR_SERVICE);
     }
 
@@ -97,7 +99,7 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
                 this.stop();
             }
         } else if (action.equals("setMedian")) {
-            Double m;
+            double m;
             try {
                 m = args.getDouble(0);
             } catch (JSONException e) {
@@ -190,12 +192,12 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
 
     public void onDestroy() {
         this.stop();
+        this.mSensorThread.quitSafely();
     }
 
     private int start() {
         // If already starting or running, then restart timeout and return
         if ((this.status == CordovaPluginRsLogman.RUNNING) || (this.status == CordovaPluginRsLogman.STARTING)) {
-            startTimeout();
             return this.status;
         }
 
@@ -207,7 +209,8 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         // If found, then register as listener
         if ((list != null) && (list.size() > 0)) {
             this.mSensor = list.get(0);
-            if (this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_FASTEST)) {
+            this.mSensorHandler = new Handler(mSensorThread.getLooper());
+            if (this.sensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_FASTEST, this.mSensorHandler)) {
                 this.setStatus(CordovaPluginRsLogman.STARTING);
                 // CB-11531: Mark accuracy as 'reliable' - this is complementary to
                 // setting it to 'unreliable' 'stop' method
@@ -223,29 +226,13 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
             return this.status;
         }
 
-        startTimeout();
-
         return this.status;
     }
 
-    private void startTimeout() {
-        // Set a timeout callback on the main thread.
-        stopTimeout();
-        mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.postDelayed(mainRunnable, 2000);
-    }
-
-
-    private void stopTimeout() {
-        if (mainHandler!=null) {
-            mainHandler.removeCallbacks(mainRunnable);
-        }
-    }
     /**
      * Stop listening to acceleration sensor.
      */
     private void stop() {
-        stopTimeout();
         if (this.status != CordovaPluginRsLogman.STOPPED) {
             this.sensorManager.unregisterListener(this);
         }
@@ -253,16 +240,17 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         this.accuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
     }
 
+
     /**
      * Returns latest cached position if the sensor hasn't returned newer value.
      *
      * Called two seconds after starting the listener.
      */
     private void timeout() {
-        if (this.status == CordovaPluginRsLogman.STARTING && this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+        if (this.status == CordovaPluginRsLogman.RUNNING && this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
             // call win with latest cached position
             // but first check if cached position is reliable
-            this.timestamp = System.currentTimeMillis() * 1000000;
+            this.timestamp = System.nanoTime();
             this.win();
         }
     }
@@ -278,12 +266,12 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         if (sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
             return;
         }
+        this.accuracy = accuracy;
 
         // If not running, then just return
         if (this.status == CordovaPluginRsLogman.STOPPED) {
             return;
         }
-        this.accuracy = accuracy;
     }
 
     /**
@@ -301,15 +289,14 @@ public class CordovaPluginRsLogman extends CordovaPlugin implements SensorEventL
         if (this.status == CordovaPluginRsLogman.STOPPED) {
             return;
         }
-        this.setStatus(CordovaPluginRsLogman.RUNNING);
 
         if (this.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+            this.setStatus(CordovaPluginRsLogman.RUNNING);
             // Save time that event was received
             this.timestamp = event.timestamp;
             this.x = event.values[0];
             this.y = event.values[1];
             this.z = event.values[2];
-
             this.win();
         }
     }
